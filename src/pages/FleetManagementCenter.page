@@ -1,0 +1,151 @@
+    <apex:page id="FleetManagementCenter" controller="FleetManagementCenterController" sideBar="false"
+           lightningStylesheets="true">
+
+    <apex:sectionHeader subtitle="Fleet Management Center" title="Fleet Management"/>
+
+    <script type="text/javascript">
+        function checkAll(cb, cbid) {
+            var inputElem = document.getElementsByTagName("input");
+
+            for (var i = 0; i < inputElem.length; i++) {
+                if (inputElem[i].id.indexOf(cbid) != -1) {
+                    inputElem[i].checked = cb.checked;
+                }
+            }
+        }
+    </script>
+
+    <apex:form id="theForm">
+        <apex:pageBlock>
+
+            <apex:pageMessages id="theMessages"/>
+
+            <apex:outputPanel id="filterPanel">
+                <h4> Filter by Manufacturer </h4>
+                <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
+                    <apex:actionSupport event="onchange" action="{!resetAndReloadCarTypeWrapperList}"></apex:actionSupport>
+                    <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
+                    <apex:selectOptions value="{!manufacturerSelectOptions}"/>
+                </apex:selectList>
+            </apex:outputPanel>
+
+            <apex:pageBlockSection columns="2" collapsible="true">
+                <apex:outputPanel id="carTypePanel">
+
+                    <apex:pageBlockTable title="Car Types" value="{!carTypeWrapperList}" var="carTypeWrapper"
+                                         rendered="{!carTypeWrapperList.size != null}">
+                        <apex:column>
+                            <apex:facet name="header">
+                                <apex:inputCheckbox onclick="checkAll(this,'checkOrUncheckButton')"/>
+                            </apex:facet>
+                            <apex:inputCheckbox value="{!carTypeWrapper.selected}"
+                                                id="checkOrUncheckButton"/>
+                        </apex:column>
+
+                        <apex:column headerValue="Car Type Name" value="{!carTypeWrapper.name}"/>
+
+                        <apex:column headerValue="Number of cars owned" value="{!carTypeWrapper.numberOfCarsOwned}">
+                            <apex:facet name="header">
+                                <apex:commandLink action="{!sortByNumberOfCarsOwned}" reRender="carTypePanel">
+                                    Number of cars owned
+                                    <apex:outputPanel layout="none" rendered="{!numberOfCarsOwnedSort = false}">&nbsp;
+                                        &nbsp; &#9650;&#9660;
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none"
+                                                      rendered="{!numberOfCarsOwnedSort = true && orderByAscDesc='Asc'}">
+                                        &nbsp; &nbsp; &#9650;
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none"
+                                                      rendered="{!numberOfCarsOwnedSort = true && orderByAscDesc='Desc'}">
+                                        &nbsp; &nbsp; &#9660;
+                                    </apex:outputPanel>
+                                </apex:commandLink>
+                            </apex:facet>
+                        </apex:column>
+
+                        <apex:column headerValue="Number of cars on road" value="{!carTypeWrapper.numberOfCarsOnRoad}">
+                            <apex:facet name="header">
+                                <apex:commandLink action="{!sortByNumberOfCarsOnRoad}" reRender="carTypePanel">
+                                    Number of cars on road
+                                    <apex:outputPanel layout="none" rendered="{!numberOfCarsOnRoadSort = false}">&nbsp;
+                                        &nbsp; &#9650;&#9660;
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none"
+                                                      rendered="{!numberOfCarsOnRoadSort = true && orderByAscDesc='Asc'}">
+                                        &nbsp; &nbsp; &#9650;
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none"
+                                                      rendered="{!numberOfCarsOnRoadSort = true && orderByAscDesc='Desc'}">
+                                        &nbsp; &nbsp; &#9660;
+                                    </apex:outputPanel>
+                                </apex:commandLink>
+                            </apex:facet>
+                        </apex:column>
+
+                        <apex:column headerValue="Total Revenue" value="{!carTypeWrapper.totalRevenue}"/>
+
+
+                        <apex:column headerValue="Average Revenue Per Car"
+                                     value="{!carTypeWrapper.averageRevenuePerCar}"/>
+
+                        <apex:facet name="footer">Page {!pageNumber} of {!totalPages} / Records {!currentListOffset}
+                            -{!MIN(currentListOffset + paginationSize, currentListSize)}
+                            of {!currentListSize}</apex:facet>
+
+                    </apex:pageBlockTable>
+
+
+                    <apex:outputText rendered="{!carTypeWrapperList.size = null && currentListOffset = 0}">
+                        <h3>No Car Types available at the moment</h3>
+                    </apex:outputText>
+
+                    <apex:outputText rendered="{!carTypeWrapperList.size = null && currentListOffset != 0}">
+                        <h3>No more Car Types available in this page. Please go to the previous page.</h3>
+                    </apex:outputText>
+
+                </apex:outputPanel>
+
+
+                <apex:outputPanel id="selectedCarsPanel">
+                    <apex:pageBlockTable title="Car Details" value="{!selectedCarWrapperList}" var="selectedCarWrapper">
+
+                        <apex:column headerValue="Manufacturer" value="{!selectedCarWrapper.manufacturer}"/>
+                        <apex:column headerValue="CarTypeName" value="{!selectedCarWrapper.carTypeName}"/>
+                        <apex:column headerValue="Kilometers Driven" value="{!selectedCarWrapper.kilometersDriven}"/>
+                        <apex:column headerValue="Is Available" value="{!selectedCarWrapper.isAvailable}"/>
+
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton value="Show Selected Car Details" action="{!updateSelectedCarWrapperList}"
+                                    style="width:165px;"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"
+                                    style="width:160px;"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockButtons location="bottom">
+                <apex:outputPanel id="carTypeButtons">
+                    <apex:commandButton action="{!first}" title="First Page" value="« First Page"
+                                        disabled="{!hasPrevious}"
+                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        style="width:95px;"/>
+                    <apex:commandButton action="{!previous}" title="Previous Page" value="< Previous"
+                                        disabled="{!hasPrevious}"
+                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        style="width:95px;"/>
+                    <apex:commandButton action="{!next}" title="Next Page" value="Next >"
+                                        disabled="{!hasNext}"
+                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        style="width:95px;"/>
+                    <apex:commandButton action="{!last}" title="Last Page" value="Last Page »"
+                                        disabled="{!hasNext}"
+                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        style="width:95px;"/>
+                </apex:outputPanel>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
