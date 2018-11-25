@@ -3,13 +3,10 @@ public with sharing class FleetManagementUtils {
     public class CarTypeWrapper {
 
         //Variable to hold Car Type fields
-        public Id carTypeId {get; set;}
-        public String Name {get; set;}
+        public CarType__c carType {get; set;}
+        public String name {get; set;}
         public Integer numberOfCarsOwned {get; set;}
         public Integer numberOfCarsOnRoad {get; set;}
-
-        public Decimal totalRevenue {get; set;}
-        public Decimal averageRevenuePerCar {get; set;}
 
         //List tp hold related Cars of a specific Car Type
         public List<Car__c> carList {get; set;}
@@ -18,14 +15,12 @@ public with sharing class FleetManagementUtils {
         public Boolean selected {get; set;}
 
         //Constructor to initialise a Car Type Wrapper Object and set the selected boolean value to false
-        public CarTypeWrapper(CarType__c carType, List<Car__c> carList, List<Subscription__c> subscriptionList) {
+        public CarTypeWrapper(CarType__c carType, List<Car__c> carList) {
 
-            this.carTypeId = carType.Id;
-            this.Name = carType.Name;
+            this.carType = carType;
+            this.name = carType.Name;
             this.numberOfCarsOwned = Integer.valueOf(carType.NumberOfCarsOwned__c);
             this.numberOfCarsOnRoad = Integer.valueOf(carType.NumberOfCarsOnRoad__c);
-            this.totalRevenue = FleetManagementUtils.getTotalRevenue(subscriptionList);
-            this.averageRevenuePerCar = (this.totalRevenue / this.numberOfCarsOwned).setScale(2);
             this.selected = false;
 
             this.carList = carList;
@@ -36,19 +31,28 @@ public with sharing class FleetManagementUtils {
 
     public class CarWrapper {
 
-        public Id carId {get; set;}
         public String carTypeName {get; set;}
         public String manufacturer {get; set;}
-        public Integer kilometersDriven {get; set;}
-        public String isAvailable {get; set;}
+        public Integer numberOfAvailableCars {get; set;}
+        public Integer totalMileage {get; set;}
+        public Integer averageMileage {get; set;}
+        public String firstSubscriptionDate {get; set;}
+        public Decimal totalRevenue {get; set;}
+        public Decimal averageRevenuePerCar {get; set;}
+        public Decimal averageRevenuePerKm {get; set;}
 
-        public CarWrapper(Car__c car) {
 
-            this.carId = car.Id;
-            this.carTypeName = car.CarType__r.Name;
-            this.manufacturer = car.CarType__r.Manufacturer__r.Name;
-            this.kilometersDriven = Integer.valueOf(car.KilometersDriven__c);
-            this.isAvailable = car.IsAvailable__c ? 'Available' : 'Not Available';
+        public CarWrapper(CarType__c carType) {
+
+            this.carTypeName = carType.Name;
+            this.manufacturer = carType.Manufacturer__r.Name;
+            this.numberOfAvailableCars = Integer.valueOf(carType.NumberOfAvailableCars__c);
+            this.totalRevenue = FleetManagementUtils.getTotalRevenue(carType.Subscriptions__r);
+            this.averageRevenuePerCar = (this.totalRevenue / carType.NumberOfCarsOwned__c).setScale(2);
+            this.firstSubscriptionDate = carType.FirstSubscriptionDate__c.format();
+            this.totalMileage = FleetManagementUtils.getTotalMileage(carType.Cars__r);
+            this.averageMileage = Integer.valueOf(this.totalMileage / carType.NumberOfCarsOwned__c);
+            this.averageRevenuePerKm = (this.totalRevenue / this.totalMileage).setScale(2);
 
         }
 
@@ -65,6 +69,19 @@ public with sharing class FleetManagementUtils {
         }
 
         return totalRevenue;
+    }
+
+    public static Integer getTotalMileage(List<Car__c> carList) {
+
+        Decimal totalMileage = 0.0;
+
+        if(!carList.isEmpty()) {
+            for(Car__c car : carList) {
+                totalMileage += car.KilometersDriven__c;
+            }
+        }
+
+        return Integer.valueOf(totalMileage);
     }
 
 }

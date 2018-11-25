@@ -20,7 +20,9 @@
 
             <apex:pageMessages id="theMessages"/>
 
-            <apex:pageBlockSection columns="2" collapsible="false">
+            <apex:outputText title="info" value="Please select Car Type(s) to show details: " style="font-weight:800"/>
+
+            <apex:pageBlockSection columns="2" collapsible="true">
                 <apex:outputPanel id="carTypePanel">
 
                     <apex:pageBlockTable title="Car Types" value="{!carTypeWrapperList}" var="carTypeWrapper"
@@ -42,7 +44,7 @@
                         <apex:column headerValue="Number of cars owned" value="{!carTypeWrapper.numberOfCarsOwned}">
                             <apex:facet name="header">
                                 <apex:commandLink action="{!sortByNumberOfCarsOwned}" reRender="carTypePanel">
-                                    Number of cars owned
+                                    Cars owned
                                     <apex:outputPanel layout="none" rendered="{!numberOfCarsOwnedSort = false}">&nbsp;
                                         &nbsp; &#9650;&#9660;
                                     </apex:outputPanel>
@@ -61,7 +63,7 @@
                         <apex:column headerValue="Number of cars on road" value="{!carTypeWrapper.numberOfCarsOnRoad}">
                             <apex:facet name="header">
                                 <apex:commandLink action="{!sortByNumberOfCarsOnRoad}" reRender="carTypePanel">
-                                    Number of cars on road
+                                    Cars on road
                                     <apex:outputPanel layout="none" rendered="{!numberOfCarsOnRoadSort = false}">&nbsp;
                                         &nbsp; &#9650;&#9660;
                                     </apex:outputPanel>
@@ -76,12 +78,6 @@
                                 </apex:commandLink>
                             </apex:facet>
                         </apex:column>
-
-                        <apex:column headerValue="Total Revenue" value="{!carTypeWrapper.totalRevenue}"/>
-
-
-                        <apex:column headerValue="Average Revenue Per Car"
-                                     value="{!carTypeWrapper.averageRevenuePerCar}"/>
 
                         <apex:facet name="footer">Page {!pageNumber} of {!totalPages} / Records {!currentListOffset}
                             -{!MIN(currentListOffset + paginationSize, currentListSize)}
@@ -102,17 +98,20 @@
 
 
                 <apex:outputPanel id="selectedCarsPanel">
-                    <apex:pageBlockTable title="Car Details" value="{!selectedCarWrapperList}" var="selectedCarWrapper"
-                                         rendered="{!hasCarType}">
+                    <apex:pageBlockTable title="Car Details" value="{!selectedCarWrapperList}" var="selectedCarWrapper" rendered="{!hasCarType}">
 
+                        <apex:column headerValue="Car Type Name" value="{!selectedCarWrapper.carTypeName}" style="width:250px"/>
                         <apex:column headerValue="Manufacturer" value="{!selectedCarWrapper.manufacturer}"/>
-                        <apex:column headerValue="CarTypeName" value="{!selectedCarWrapper.carTypeName}"/>
-                        <apex:column headerValue="Kilometers Driven" value="{!selectedCarWrapper.kilometersDriven}"/>
-                        <apex:column headerValue="Is Available" value="{!selectedCarWrapper.isAvailable}"/>
+                        <apex:column headerValue="Total Revenue" value="{!selectedCarWrapper.totalRevenue}"/>
+                        <apex:column headerValue="Average Revenue Per Km" value="{!selectedCarWrapper.averageRevenuePerKm}"/>
+                        <apex:column headerValue="Average Revenue Per Car" value="{!selectedCarWrapper.averageRevenuePerCar}"/>
+                        <apex:column headerValue="Total Mileage" value="{!selectedCarWrapper.totalMileage}"/>
+                        <apex:column headerValue="Average Mileage" value="{!selectedCarWrapper.averageMileage}"/>
+                        <apex:column headerValue="First Subscription Date" value="{!selectedCarWrapper.firstSubscriptionDate}"/>
+                        <apex:column headerValue="Number of Available Cars" value="{!selectedCarWrapper.numberOfAvailableCars}"/>
 
                     </apex:pageBlockTable>
                 </apex:outputPanel>
-
 
             </apex:pageBlockSection>
 
@@ -153,7 +152,7 @@
             <h4> Filter by Manufacturer </h4>
             <apex:actionRegion>
                 <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
-                    <apex:actionSupport event="onchange" action="{!resetPaginationParametersAndDeselectCarTypeSelections}"
+                    <apex:actionSupport event="onchange" action="{!resetPaginationParametersAndCarTypeSelections}"
                                         reRender="carTypePanel, selectedCarsPanel, paginationButtons"></apex:actionSupport>
                     <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
                     <apex:selectOptions value="{!manufacturerSelectOptions}"/>

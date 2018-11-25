@@ -81,11 +81,8 @@ public with sharing class FleetManagementCenterController {
         }
 
         for (FleetManagementUtils.CarTypeWrapper carTypeWrapper : this.carTypeWrapperList) {
-            System.debug('***'+carTypeWrapper.selected);
             if (carTypeWrapper.selected) {
-                for (Car__c car : carTypeWrapper.carList) {
-                    this.selectedCarWrapperList.add(new FleetManagementUtils.CarWrapper(car));
-                }
+                this.selectedCarWrapperList.add(new FleetManagementUtils.CarWrapper(carTypeWrapper.carType));
             }
         }
 
@@ -101,9 +98,10 @@ public with sharing class FleetManagementCenterController {
         //String sManufacturerIdClause = '(\'\')';
 
         String sSelectFromANDWhereClause =
-                'SELECT Id, Name, NumberOfCarsOnRoad__c, NumberOfCarsOwned__c, Manufacturer__c,'
+                'SELECT Id, Name, NumberOfCarsOnRoad__c, NumberOfCarsOwned__c, NumberOfAvailableCars__c, '
+                        + ' Manufacturer__c, Manufacturer__r.Name, FirstSubscriptionDate__c,'
                         + ' (SELECT Id, TotalRevenueUntilToday__c FROM Subscriptions__r),'
-                        + ' (SELECT Id, KilometersDriven__c, IsAvailable__c, CarType__r.Name, CarType__r.Manufacturer__r.Name FROM Cars__r)'
+                        + ' (SELECT Id, KilometersDriven__c, IsAvailable__c FROM Cars__r)'
                         + ' FROM CarType__c';
 
         if(this.selectedManufacturer != null && this.selectedManufacturer != 'all') {
@@ -121,7 +119,7 @@ public with sharing class FleetManagementCenterController {
         List<FleetManagementUtils.CarTypeWrapper> carTypeWrapperList = new List<FleetManagementUtils.CarTypeWrapper>();
 
         for (CarType__c carType : carTypeList) {
-            carTypeWrapperList.add(new FleetManagementUtils.CarTypeWrapper(carType, carType.Cars__r, carType.Subscriptions__r));
+            carTypeWrapperList.add(new FleetManagementUtils.CarTypeWrapper(carType, carType.Cars__r));
         }
 
         return carTypeWrapperList;
@@ -130,20 +128,18 @@ public with sharing class FleetManagementCenterController {
     private Map<Id, CarManufacturer__c> getCarManufacturersByIdMap() {
 
         if(this.carManufacturersByNameMap == null) {
-            return (new Map<Id, CarManufacturer__c>([SELECT Id, Name FROM CarManufacturer__c WHERE NumberOfCarTypes__c > 0]));
+            return (new Map<Id, CarManufacturer__c>([SELECT Id, Name FROM CarManufacturer__c WHERE NumberOfCarTypes__c > 0 ORDER BY Name ASC]));
         }
 
         return this.carManufacturersByNameMap;
 
     }
 
-    public PageReference resetPaginationParametersAndDeselectCarTypeSelections() {
+    public PageReference resetPaginationParametersAndCarTypeSelections() {
         initializePaginationParameters();
 
-        for(FleetManagementUtils.CarTypeWrapper carTypeWrapper : this.carTypeWrapperList) {
-            if(carTypeWrapper.selected) {
-                carTypeWrapper.selected = false;
-            }
+        if(this.selectedCarWrapperList != null) {
+            this.selectedCarWrapperList.clear();
         }
 
         return null;
