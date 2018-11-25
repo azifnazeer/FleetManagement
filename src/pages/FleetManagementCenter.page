@@ -1,4 +1,4 @@
-    <apex:page id="FleetManagementCenter" controller="FleetManagementCenterController" sideBar="false"
+<apex:page id="FleetManagementCenter" controller="FleetManagementCenterController" sideBar="false"
            lightningStylesheets="true">
 
     <apex:sectionHeader subtitle="Fleet Management Center" title="Fleet Management"/>
@@ -19,32 +19,21 @@
         <apex:pageBlock>
 
             <apex:pageMessages id="theMessages"/>
-            <!--<apex:pageBlockSection>
-                <apex:pageBlockSectionItem>
-                    <apex:outputPanel id="filterPanel">
-                        <h4> Filter by Manufacturer </h4>
-                        <apex:actionRegion>
-                            <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
-                                <apex:actionSupport event="onchange" action="{!resetAndReloadCarTypeWrapperList}"
-                                                    reRender="carTypePanel"></apex:actionSupport>
-                                <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
-                                <apex:selectOptions value="{!manufacturerSelectOptions}"/>
-                            </apex:selectList>
-                        </apex:actionRegion>
-                    </apex:outputPanel>
-                    </apex:pageBlockSectionItem>
-            </apex:pageBlockSection>-->
 
-
-            <apex:pageBlockSection columns="2" collapsible="true">
+            <apex:pageBlockSection columns="2" collapsible="false">
                 <apex:outputPanel id="carTypePanel">
 
                     <apex:pageBlockTable title="Car Types" value="{!carTypeWrapperList}" var="carTypeWrapper"
-                                         rendered="{!carTypeWrapperList.size != null}">
+                                         rendered="{!hasCarType}">
                         <apex:column>
-                            <apex:facet name="header"> <apex:inputCheckbox onclick="checkAll(this,'checkOrUncheckButton')"/> </apex:facet>
+                            <apex:facet name="header">
+                                <apex:inputCheckbox onclick="checkAll(this,'checkOrUncheckButton')"/>
+                            </apex:facet>
 
-                            <apex:inputCheckbox value="{!carTypeWrapper.selected}" id="checkOrUncheckButton"/>
+                            <apex:actionRegion>
+                                <apex:inputCheckbox value="{!carTypeWrapper.selected}" id="checkOrUncheckButton"/>
+                                <apex:actionSupport event="onclick" action="{!setSelectedCarWrapperList}" reRender="selectedCarsPanel"/>
+                            </apex:actionRegion>
 
                         </apex:column>
 
@@ -101,7 +90,7 @@
                     </apex:pageBlockTable>
 
 
-                    <apex:outputText rendered="{!carTypeWrapperList.size = null && currentListOffset = 0}">
+                    <apex:outputText rendered="{!!hasCarType}">
                         <h3>No Car Types available at the moment</h3>
                     </apex:outputText>
 
@@ -113,7 +102,8 @@
 
 
                 <apex:outputPanel id="selectedCarsPanel">
-                    <apex:pageBlockTable title="Car Details" value="{!selectedCarWrapperList}" var="selectedCarWrapper">
+                    <apex:pageBlockTable title="Car Details" value="{!selectedCarWrapperList}" var="selectedCarWrapper"
+                                         rendered="{!hasCarType}">
 
                         <apex:column headerValue="Manufacturer" value="{!selectedCarWrapper.manufacturer}"/>
                         <apex:column headerValue="CarTypeName" value="{!selectedCarWrapper.carTypeName}"/>
@@ -127,32 +117,48 @@
             </apex:pageBlockSection>
 
             <apex:pageBlockButtons location="top">
-                <apex:commandButton value="Show Selected Car Details" action="{!setSelectedCarWrapperList}"
-                                    style="width:165px;"/>
-                <apex:commandButton value="Cancel" action="{!cancel}"
-                                    style="width:160px;"/>
+                <apex:outputPanel id="carTypeButtons">
+                    <apex:commandButton value="Show Selected Car Details" action="{!setSelectedCarWrapperList}"
+                                        style="width:165px;" disabled="{!!hasCarType}" reRender="selectedCarsPanel, carTypeButtons"/>
+                    <apex:commandButton value="Cancel" action="{!cancel}"
+                                        style="width:160px;"/>
+                </apex:outputPanel>
             </apex:pageBlockButtons>
 
             <apex:pageBlockButtons location="bottom">
-                <apex:outputPanel id="carTypeButtons">
+                <apex:outputPanel id="paginationButtons">
                     <apex:commandButton action="{!first}" title="First Page" value="« First Page"
                                         disabled="{!hasPrevious}"
-                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
                                         style="width:95px;"/>
                     <apex:commandButton action="{!previous}" title="Previous Page" value="< Previous"
                                         disabled="{!hasPrevious}"
-                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
                                         style="width:95px;"/>
                     <apex:commandButton action="{!next}" title="Next Page" value="Next >"
                                         disabled="{!hasNext}"
-                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
                                         style="width:95px;"/>
                     <apex:commandButton action="{!last}" title="Last Page" value="Last Page »"
                                         disabled="{!hasNext}"
-                                        reRender="carTypePanel, selectedCarsPanel, carTypeButtons"
+                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
                                         style="width:95px;"/>
                 </apex:outputPanel>
             </apex:pageBlockButtons>
+
+
         </apex:pageBlock>
+
+        <apex:outputPanel id="filterPanel" rendered="{!hasCarType}">
+            <h4> Filter by Manufacturer </h4>
+            <apex:actionRegion>
+                <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
+                    <apex:actionSupport event="onchange" action="{!resetPaginationParametersAndDeselectCarTypeSelections}"
+                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"></apex:actionSupport>
+                    <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
+                    <apex:selectOptions value="{!manufacturerSelectOptions}"/>
+                </apex:selectList>
+            </apex:actionRegion>
+        </apex:outputPanel>
     </apex:form>
 </apex:page>

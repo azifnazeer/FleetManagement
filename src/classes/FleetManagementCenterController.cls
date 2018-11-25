@@ -3,7 +3,7 @@ public with sharing class FleetManagementCenterController {
     public List<FleetManagementUtils.CarTypeWrapper> carTypeWrapperList;
     public List<FleetManagementUtils.CarWrapper> selectedCarWrapperList;
 
-    public Boolean isInConsole { get; set; } { isInConsole = false; }
+    public Boolean hasCarType { get; set; }
 
     public Integer currentListSize { get; set; }
     public Integer currentListOffset { get; set; }
@@ -38,6 +38,10 @@ public with sharing class FleetManagementCenterController {
         //Initialize manufacture id list with all possible manufacturers
         this.carManufacturersByNameMap = getCarManufacturersByIdMap();
 
+        this.carTypeWrapperList = getCarTypeWrapperList();
+
+        this.hasCarType = (this.carTypeWrapperList != null && this.carTypeWrapperList.size() > 0) ? true : false;
+
     }
 
     public List<FleetManagementUtils.CarTypeWrapper> getCarTypeWrapperList() {
@@ -48,6 +52,7 @@ public with sharing class FleetManagementCenterController {
 
             if (!carTypeList.isEmpty()) {
                 this.carTypeWrapperList = createCarTypeWrapperList(carTypeList);
+
                 return this.carTypeWrapperList;
             }
 
@@ -132,8 +137,14 @@ public with sharing class FleetManagementCenterController {
 
     }
 
-    public PageReference resetAndReloadCarTypeWrapperList() {
+    public PageReference resetPaginationParametersAndDeselectCarTypeSelections() {
         initializePaginationParameters();
+
+        for(FleetManagementUtils.CarTypeWrapper carTypeWrapper : this.carTypeWrapperList) {
+            if(carTypeWrapper.selected) {
+                carTypeWrapper.selected = false;
+            }
+        }
 
         return null;
 
@@ -160,10 +171,9 @@ public with sharing class FleetManagementCenterController {
     public void initializePaginationParameters() {
 
         if(this.selectedManufacturer != null && this.selectedManufacturer != 'all') {
-            this.currentListSize = [SELECT count() FROM CarType__c WHERE Manufacturer__r.Name = :this.selectedManufacturer];
+            this.currentListSize = [SELECT count() FROM CarType__c WHERE Manufacturer__c = :this.carManufacturersByNameMap.get(this.selectedManufacturer).Id];
         } else {
             this.currentListSize = [SELECT count() FROM CarType__c];
-
         }
 
         this.currentListOffset = 0;
