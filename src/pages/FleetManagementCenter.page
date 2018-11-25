@@ -19,15 +19,22 @@
         <apex:pageBlock>
 
             <apex:pageMessages id="theMessages"/>
+            <!--<apex:pageBlockSection>
+                <apex:pageBlockSectionItem>
+                    <apex:outputPanel id="filterPanel">
+                        <h4> Filter by Manufacturer </h4>
+                        <apex:actionRegion>
+                            <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
+                                <apex:actionSupport event="onchange" action="{!resetAndReloadCarTypeWrapperList}"
+                                                    reRender="carTypePanel"></apex:actionSupport>
+                                <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
+                                <apex:selectOptions value="{!manufacturerSelectOptions}"/>
+                            </apex:selectList>
+                        </apex:actionRegion>
+                    </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>-->
 
-            <apex:outputPanel id="filterPanel">
-                <h4> Filter by Manufacturer </h4>
-                <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
-                    <apex:actionSupport event="onchange" action="{!resetAndReloadCarTypeWrapperList}"></apex:actionSupport>
-                    <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
-                    <apex:selectOptions value="{!manufacturerSelectOptions}"/>
-                </apex:selectList>
-            </apex:outputPanel>
 
             <apex:pageBlockSection columns="2" collapsible="true">
                 <apex:outputPanel id="carTypePanel">
@@ -35,14 +42,13 @@
                     <apex:pageBlockTable title="Car Types" value="{!carTypeWrapperList}" var="carTypeWrapper"
                                          rendered="{!carTypeWrapperList.size != null}">
                         <apex:column>
-                            <apex:facet name="header">
-                                <apex:inputCheckbox onclick="checkAll(this,'checkOrUncheckButton')"/>
-                            </apex:facet>
-                            <apex:inputCheckbox value="{!carTypeWrapper.selected}"
-                                                id="checkOrUncheckButton"/>
+                            <apex:facet name="header"> <apex:inputCheckbox onclick="checkAll(this,'checkOrUncheckButton')"/> </apex:facet>
+
+                            <apex:inputCheckbox value="{!carTypeWrapper.selected}" id="checkOrUncheckButton"/>
+
                         </apex:column>
 
-                        <apex:column headerValue="Car Type Name" value="{!carTypeWrapper.name}"/>
+                        <apex:column headerValue="Car Type Name" value="{!carTypeWrapper.name}" style="width:250px"/>
 
                         <apex:column headerValue="Number of cars owned" value="{!carTypeWrapper.numberOfCarsOwned}">
                             <apex:facet name="header">
@@ -117,10 +123,11 @@
                     </apex:pageBlockTable>
                 </apex:outputPanel>
 
+
             </apex:pageBlockSection>
 
             <apex:pageBlockButtons location="top">
-                <apex:commandButton value="Show Selected Car Details" action="{!updateSelectedCarWrapperList}"
+                <apex:commandButton value="Show Selected Car Details" action="{!setSelectedCarWrapperList}"
                                     style="width:165px;"/>
                 <apex:commandButton value="Cancel" action="{!cancel}"
                                     style="width:160px;"/>

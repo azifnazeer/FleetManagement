@@ -67,7 +67,7 @@ public with sharing class FleetManagementCenterController {
         return this.selectedCarWrapperList;
     }
 
-    public PageReference updateSelectedCarWrapperList() {
+    public PageReference setSelectedCarWrapperList() {
 
         if(this.selectedCarWrapperList == null) {
             this.selectedCarWrapperList = new List<FleetManagementUtils.CarWrapper>();
@@ -76,6 +76,7 @@ public with sharing class FleetManagementCenterController {
         }
 
         for (FleetManagementUtils.CarTypeWrapper carTypeWrapper : this.carTypeWrapperList) {
+            System.debug('***'+carTypeWrapper.selected);
             if (carTypeWrapper.selected) {
                 for (Car__c car : carTypeWrapper.carList) {
                     this.selectedCarWrapperList.add(new FleetManagementUtils.CarWrapper(car));
@@ -124,7 +125,7 @@ public with sharing class FleetManagementCenterController {
     private Map<Id, CarManufacturer__c> getCarManufacturersByIdMap() {
 
         if(this.carManufacturersByNameMap == null) {
-            return (new Map<Id, CarManufacturer__c>([SELECT Id, Name FROM CarManufacturer__c]));
+            return (new Map<Id, CarManufacturer__c>([SELECT Id, Name FROM CarManufacturer__c WHERE NumberOfCarTypes__c > 0]));
         }
 
         return this.carManufacturersByNameMap;

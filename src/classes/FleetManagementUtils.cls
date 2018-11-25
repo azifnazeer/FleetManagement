@@ -17,7 +17,6 @@ public with sharing class FleetManagementUtils {
         //Boolean value to hold the selection of specific Car Type
         public Boolean selected {get; set;}
 
-
         //Constructor to initialise a Car Type Wrapper Object and set the selected boolean value to false
         public CarTypeWrapper(CarType__c carType, List<Car__c> carList, List<Subscription__c> subscriptionList) {
 
