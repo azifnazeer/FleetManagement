@@ -1,7 +1,10 @@
+/**
+* Controller Class for Fleet Management Center Page
+*/
 public with sharing class FleetManagementCenterController {
 
     public List<FleetManagementUtils.CarTypeWrapper> carTypeWrapperList;
-    public List<FleetManagementUtils.CarWrapper> selectedCarWrapperList;
+    public List<FleetManagementUtils.CarTypeDetailsWrapper> selectedCarTypeDetailsWrapperList;
 
     public Boolean hasCarType { get; set; }
 
@@ -26,6 +29,9 @@ public with sharing class FleetManagementCenterController {
 
     private final String INITIAL_SORT_ORDER = 'Desc';
 
+    /**
+    * Constuctor method for initializing the necessary data
+    */
     public FleetManagementCenterController() {
 
         //Initializing sorting parameters
@@ -47,6 +53,9 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Method for creating and returning Car Type Wrapper List for the carTypePanel in the VF Page
+    */
     public List<FleetManagementUtils.CarTypeWrapper> getCarTypeWrapperList() {
 
         try {
@@ -68,26 +77,36 @@ public with sharing class FleetManagementCenterController {
 
     }
 
-    public List<FleetManagementUtils.CarWrapper> getSelectedCarWrapperList() {
+    /**
+    *  Method for returning selected Car Type Details Wrapper List for the selectedCarTypesPanel in the VF Page
+    */
+    public List<FleetManagementUtils.CarTypeDetailsWrapper> getSelectedCarTypeDetailsWrapperList() {
 
-        return this.selectedCarWrapperList;
+        if(this.selectedCarTypeDetailsWrapperList != null) {
+            return this.selectedCarTypeDetailsWrapperList;
+        }
 
+        return new List<FleetManagementUtils.CarTypeDetailsWrapper>();
     }
 
-    public PageReference updateSelectedCarWrapperList() {
+    /**
+    *  Method for updating selected Car Type Details Wrapper List
+    */
+    public PageReference updateSelectedCarTypeDetailsWrapperList() {
+
         Boolean hasSelectedCarType = false;
 
         try {
 
-            if (this.selectedCarWrapperList == null) {
-                this.selectedCarWrapperList = new List<FleetManagementUtils.CarWrapper>();
+            if (this.selectedCarTypeDetailsWrapperList == null) {
+                this.selectedCarTypeDetailsWrapperList = new List<FleetManagementUtils.CarTypeDetailsWrapper>();
             } else {
-                this.selectedCarWrapperList.clear();
+                this.selectedCarTypeDetailsWrapperList.clear();
             }
 
             for (FleetManagementUtils.CarTypeWrapper carTypeWrapper : this.carTypeWrapperList) {
                 if (carTypeWrapper.selected) {
-                    this.selectedCarWrapperList.add(new FleetManagementUtils.CarWrapper(carTypeWrapper.carType));
+                    this.selectedCarTypeDetailsWrapperList.add(new FleetManagementUtils.CarTypeDetailsWrapper(carTypeWrapper.carType));
 
                     if(!hasSelectedCarType) {
                         hasSelectedCarType = true;
@@ -113,6 +132,9 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Method to build and return car type query
+    */
     private String createCarTypeQuery() {
 
         String sOrderByClause = ' ORDER BY ' + (String.isEmpty(this.orderBy) ? 'Name__c' : this.orderBy);
@@ -138,6 +160,9 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Method to build and return Car Type Wrapper List
+    */
     private List<FleetManagementUtils.CarTypeWrapper> createCarTypeWrapperList(List<CarType__c> carTypeList) {
 
         List<FleetManagementUtils.CarTypeWrapper> carTypeWrapperList = new List<FleetManagementUtils.CarTypeWrapper>();
@@ -150,6 +175,9 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Method to return a Map of Car Manufacturers with atleast one car, with Name as the key
+    */
     private Map<Id, CarManufacturer__c> getCarManufacturersByIdMap() {
 
         if(this.carManufacturersByNameMap == null) {
@@ -160,18 +188,24 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Method to reset pagination parameters
+    */
     public PageReference resetPaginationParametersAndCarTypeSelections() {
 
         initializePaginationParameters();
 
-        if(this.selectedCarWrapperList != null) {
-            this.selectedCarWrapperList.clear();
+        if(this.selectedCarTypeDetailsWrapperList != null) {
+            this.selectedCarTypeDetailsWrapperList.clear();
         }
 
         return null;
 
     }
 
+    /**
+    *  Action Method for closing the Fleet Management Center and going back to home page
+    */
     public PageReference cancel() {
 
         PageReference cancelToHomePage = new PageReference('/');
@@ -180,6 +214,9 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Method to return values for Manufacturer Filter
+    */
     public List<SelectOption> getManufacturerSelectOptions () {
 
         List<SelectOption> options = new List<SelectOption>();
@@ -192,8 +229,12 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Method for initializing pagination parameters
+    */
     public void initializePaginationParameters() {
 
+        //Limit list size, if a manufacturer filter is applied
         if(this.selectedManufacturer != null && this.selectedManufacturer != 'all') {
             this.currentListSize = [SELECT count() FROM CarType__c WHERE Manufacturer__c = :this.carManufacturersByNameMap.get(this.selectedManufacturer).Id];
         } else {
@@ -209,6 +250,9 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Following methods are used for the pagination
+    */
     public PageReference first() {
 
         this.currentListOffset = 0;
@@ -279,6 +323,9 @@ public with sharing class FleetManagementCenterController {
 
     }
 
+    /**
+    *  Following methods are used for sorting based on Cars Owned, Cars On Road, or Average Revenue per km
+    */
     public PageReference sortByNumberOfCarsOwned() {
 
         this.numberOfCarsOwnedSort = true;

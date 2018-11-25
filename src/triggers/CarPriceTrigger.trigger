@@ -1,10 +1,12 @@
 trigger CarPriceTrigger on CarPrice__c (before insert, before update) {
 
     if(Trigger.isBefore &&  (Trigger.isInsert  || Trigger.isUpdate)) {
-        //There should be only one active car price at a time
         toggleCarPriceAvailability(Trigger.new);
     }
 
+    /**
+    *  Method to make sure that only one CarPrice record is active at a time for each Car
+    */
     private void toggleCarPriceAvailability(List<CarPrice__c> currentCarPriceList) {
 
         Map<Id, List<CarPrice__c>> oldCarPricesByCarIdMap = new Map<Id, List<CarPrice__c>>();
@@ -52,6 +54,10 @@ trigger CarPriceTrigger on CarPrice__c (before insert, before update) {
 
     }
 
+
+    /**
+    *  Method to return a map of old car prices, with Car Id as the key
+    */
     private Map<Id, List<CarPrice__c>> getOldCarPricesByCarIdMap(Set<Id> carIdSet) {
 
         Map<Id, List<CarPrice__c>> oldCarPricesByCarIdMap = new Map<Id, List<CarPrice__c>>();

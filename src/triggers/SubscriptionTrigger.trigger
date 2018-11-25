@@ -11,6 +11,9 @@ trigger SubscriptionTrigger on Subscription__c (before insert, after insert, aft
         unblockCarsForTerminatedSubscriptions(Trigger.new);
     }
 
+    /**
+    *  Method to prevent subscription creation for non available Car Types
+    */
     private void preventSubscriptionCreationForNonAvailableCars(List<Subscription__c> currentSubscriptionList) {
 
         carTypeByIdMap = getCarTypeByIdMap(currentSubscriptionList);
@@ -32,6 +35,9 @@ trigger SubscriptionTrigger on Subscription__c (before insert, after insert, aft
 
     }
 
+    /**
+    *  Method to assign Cars for available Car Types to newly created Subscriptions
+    */
     private void assignAndBlockCarForContractedSubscriptions(List<Subscription__c> currentSubscriptionList) {
 
         Set<Id> availableCarTypeOfContractedSubscriptionsSet = new Set<Id>();
@@ -82,7 +88,9 @@ trigger SubscriptionTrigger on Subscription__c (before insert, after insert, aft
 
     }
 
-    //TODO: Add additional logic later for updating the Car with Kilometers Driven value for Terminated Subscriptions (Update method name too then.)
+    /**
+    *  Method to unblock Cars for terminated subscriptions
+    */
     private void unblockCarsForTerminatedSubscriptions(List<Subscription__c> currentSubscriptionList) {
 
         List<Car__c> carsToBeUpdatedList = new List<Car__c>();
@@ -106,6 +114,9 @@ trigger SubscriptionTrigger on Subscription__c (before insert, after insert, aft
 
     }
 
+    /**
+    *  Method to return a map of list of cars, with Car Type Id as the key
+    */
     private Map<Id, List<Car__c>> getAvailableCarsByCarTypeIdMap(Set<Id> availableCarTypeOfContractedSubscriptionsSet) {
 
         Map<Id, List<Car__c>> availableCarsByCarTypeIdMap = new Map<Id, List<Car__c>>();
@@ -131,6 +142,9 @@ trigger SubscriptionTrigger on Subscription__c (before insert, after insert, aft
 
     }
 
+    /**
+    *  Method to return a map of Car Types, with Id as the key
+    */
     private static Map<Id, CarType__c> getCarTypeByIdMap(List<Subscription__c> currentSubscriptionList) {
 
         Set<Id> carTypeIdSet = new Set<Id>();

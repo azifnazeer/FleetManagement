@@ -5,6 +5,9 @@ trigger CarTrigger on Car__c (after insert) {
         createCarPriceForNewCars(Trigger.new);
     }
 
+    /**
+    *  Method to create Car Price for each newly created Car
+    */
     private void createCarPriceForNewCars(List<Car__c> currentCarList) {
 
         Map<Id, Price__c> pricesByCarTypeIdMap = getPricesByCarTypeIdMap(currentCarList);
@@ -34,6 +37,9 @@ trigger CarTrigger on Car__c (after insert) {
 
     }
 
+    /**
+    *  Method to return a map of prices, with Car Type Id as the key
+    */
     private Map<Id, Price__c> getPricesByCarTypeIdMap(List<Car__c> currentCarList) {
 
         Map<Id, Price__c> pricesByCarTypeIdMap = new Map<Id, Price__c>();

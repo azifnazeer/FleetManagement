@@ -1,5 +1,11 @@
+/**
+*  Utility page for Fleet Management Center
+*/
 public with sharing class FleetManagementUtils {
 
+    /**
+    *  Wrapper Class for Car Type Object
+    */
     public class CarTypeWrapper {
 
         public CarType__c carType {get; set;}
@@ -30,7 +36,10 @@ public with sharing class FleetManagementUtils {
 
     }
 
-    public class CarWrapper {
+    /**
+    *  Wrapper Class for Car Type Object, with more aggregated information for the details section of Fleet Management Center
+    */
+    public class CarTypeDetailsWrapper {
 
         public String carTypeName {get; set;}
         public String manufacturer {get; set;}
@@ -42,7 +51,7 @@ public with sharing class FleetManagementUtils {
         public Decimal averageRevenuePerCar {get; set;}
 
 
-        public CarWrapper(CarType__c carType) {
+        public CarTypeDetailsWrapper(CarType__c carType) {
 
             this.carTypeName = carType.Name;
             this.manufacturer = carType.Manufacturer__r.Name;

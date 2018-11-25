@@ -112,9 +112,9 @@
                 </apex:outputPanel>
 
 
-                <apex:outputPanel id="selectedCarsPanel">
+                <apex:outputPanel id="selectedCarTypesPanel">
 
-                    <apex:pageBlockTable title="Car Details" value="{!selectedCarWrapperList}" var="selectedCarWrapper" rendered="{!hasCarType}">
+                    <apex:pageBlockTable title="Car Details" value="{!selectedCarTypeDetailsWrapperList}" var="selectedCarWrapper" rendered="{!hasCarType}">
 
                         <apex:column headerValue="Car Type Name" value="{!selectedCarWrapper.carTypeName}" style="width:250px"/>
                         <apex:column headerValue="Manufacturer" value="{!selectedCarWrapper.manufacturer}"/>
@@ -123,7 +123,7 @@
                         <apex:column headerValue="Total Mileage" value="{!selectedCarWrapper.totalMileage}"/>
                         <apex:column headerValue="Average Mileage" value="{!selectedCarWrapper.averageMileage}"/>
                         <apex:column headerValue="First Subscription Date" value="{!selectedCarWrapper.firstSubscriptionDate}"/>
-                        <apex:column headerValue="Number of Available Cars" value="{!selectedCarWrapper.numberOfAvailableCars}"/>
+                        <apex:column headerValue="Available Cars" value="{!selectedCarWrapper.numberOfAvailableCars}"/>
 
                     </apex:pageBlockTable>
 
@@ -133,8 +133,8 @@
 
             <apex:pageBlockButtons location="top">
                 <apex:outputPanel id="carTypeButtons">
-                    <apex:commandButton value="Show Selected Car Details" action="{!updateSelectedCarWrapperList}"
-                                        style="width:165px;" disabled="{!!hasCarType}" reRender="selectedCarsPanel, carTypeButtons, theMessages"/>
+                    <apex:commandButton value="Show Selected Car Details" action="{!updateSelectedCarTypeDetailsWrapperList}"
+                                        style="width:165px;" disabled="{!!hasCarType}" reRender="selectedCarTypesPanel, carTypeButtons, theMessages"/>
 
                     <apex:commandButton value="Cancel" action="{!cancel}"
                                         style="width:160px;"/>
@@ -145,19 +145,19 @@
                 <apex:outputPanel id="paginationButtons">
                     <apex:commandButton action="{!first}" title="First Page" value="« First Page"
                                         disabled="{!hasPrevious}"
-                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
+                                        reRender="carTypePanel, selectedCarTypesPanel, paginationButtons"
                                         style="width:95px;"/>
                     <apex:commandButton action="{!previous}" title="Previous Page" value="< Previous"
                                         disabled="{!hasPrevious}"
-                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
+                                        reRender="carTypePanel, selectedCarTypesPanel, paginationButtons"
                                         style="width:95px;"/>
                     <apex:commandButton action="{!next}" title="Next Page" value="Next >"
                                         disabled="{!hasNext}"
-                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
+                                        reRender="carTypePanel, selectedCarTypesPanel, paginationButtons"
                                         style="width:95px;"/>
                     <apex:commandButton action="{!last}" title="Last Page" value="Last Page »"
                                         disabled="{!hasNext}"
-                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"
+                                        reRender="carTypePanel, selectedCarTypesPanel, paginationButtons"
                                         style="width:95px;"/>
                 </apex:outputPanel>
             </apex:pageBlockButtons>
@@ -169,7 +169,7 @@
             <apex:actionRegion>
                 <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
                     <apex:actionSupport event="onchange" action="{!resetPaginationParametersAndCarTypeSelections}"
-                                        reRender="carTypePanel, selectedCarsPanel, paginationButtons"></apex:actionSupport>
+                                        reRender="carTypePanel, selectedCarTypesPanel, paginationButtons"></apex:actionSupport>
                     <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
                     <apex:selectOptions value="{!manufacturerSelectOptions}"/>
                 </apex:selectList>
