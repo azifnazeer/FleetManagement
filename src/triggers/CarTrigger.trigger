@@ -1,7 +1,7 @@
 trigger CarTrigger on Car__c (after insert) {
 
     if(Trigger.isAfter && Trigger.isInsert) {
-        //Choose the right active price for car price creation, show error if not available
+        //Choose the right active price for car price creation
         createCarPriceForNewCars(Trigger.new);
     }
 
@@ -10,22 +10,26 @@ trigger CarTrigger on Car__c (after insert) {
         Map<Id, Price__c> pricesByCarTypeIdMap = getPricesByCarTypeIdMap(currentCarList);
         List<CarPrice__c> carPriceToBeCreated = new List<CarPrice__c>();
 
-        if(!pricesByCarTypeIdMap.isEmpty()) {
-            for(Car__c currentCar : currentCarList) {
+        try{
 
-                CarPrice__c carPrice = new CarPrice__c();
-                carPrice.Car__c = currentCar.Id;
-                System.debug('***' + pricesByCarTypeIdMap.get(currentCar.CarType__c));
-                carPrice.Price__c = pricesByCarTypeIdMap.get(currentCar.CarType__c).Id;
-                carPrice.IsActive__c = true;
+            if(!pricesByCarTypeIdMap.isEmpty()) {
+                for(Car__c currentCar : currentCarList) {
 
-                carPriceToBeCreated.add(carPrice);
+                    CarPrice__c carPrice = new CarPrice__c();
+                    carPrice.Car__c = currentCar.Id;
+                    carPrice.Price__c = pricesByCarTypeIdMap.get(currentCar.CarType__c).Id;
+                    carPrice.IsActive__c = true;
 
+                    carPriceToBeCreated.add(carPrice);
+
+                }
+
+                if(!carPriceToBeCreated.isEmpty()) {
+                    insert carPriceToBeCreated;
+                }
             }
-
-            if(!carPriceToBeCreated.isEmpty()) {
-                insert carPriceToBeCreated;
-            }
+        }catch(Exception e) {
+            System.debug('Exception Caught:' + e);
         }
 
     }

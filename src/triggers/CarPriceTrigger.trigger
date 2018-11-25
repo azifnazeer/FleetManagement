@@ -1,7 +1,7 @@
 trigger CarPriceTrigger on CarPrice__c (before insert, before update) {
 
     if(Trigger.isBefore &&  (Trigger.isInsert  || Trigger.isUpdate)) {
-        //There should be only one active car price
+        //There should be only one active car price at a time
         toggleCarPriceAvailability(Trigger.new);
     }
 
@@ -11,36 +11,43 @@ trigger CarPriceTrigger on CarPrice__c (before insert, before update) {
         Set<Id> carIdSet = new Set<Id>();
         List<CarPrice__c> carPricesToBeDeactivatedList = new List<CarPrice__c>();
 
-        for(CarPrice__c currentCarPrice : currentCarPriceList) {
 
-            if(currentCarPrice.IsActive__c) {
-                carIdSet.add(currentCarPrice.Car__c);
-            }
+        try {
 
-        }
+            for (CarPrice__c currentCarPrice : currentCarPriceList) {
 
-        if(!carIdSet.isEmpty()) {
-            oldCarPricesByCarIdMap = getOldCarPricesByCarIdMap(carIdSet);
-
-            for(CarPrice__c currentCarPrice : currentCarPriceList) {
-
-                //Make sure only one Car price record is active at a time
-                if(currentCarPrice.IsActive__c
-                        && oldCarPricesByCarIdMap.get(currentCarPrice.Car__c) != null
-                        && oldCarPricesByCarIdMap.get(currentCarPrice.Car__c).size() > 0) {
-                    for(CarPrice__c oldCarPrice : oldCarPricesByCarIdMap.get(currentCarPrice.Car__c)) {
-                        if(oldCarPrice.IsActive__c) {
-                            oldCarPrice.IsActive__c = false;
-                            carPricesToBeDeactivatedList.add(oldCarPrice);
-                        }
-                    }
+                if (currentCarPrice.IsActive__c) {
+                    carIdSet.add(currentCarPrice.Car__c);
                 }
 
             }
 
-            if(!carPricesToBeDeactivatedList.isEmpty()) {
-                update carPricesToBeDeactivatedList;
+            if (!carIdSet.isEmpty()) {
+                oldCarPricesByCarIdMap = getOldCarPricesByCarIdMap(carIdSet);
+
+                for (CarPrice__c currentCarPrice : currentCarPriceList) {
+
+                    //Make sure only one Car price record is active at a time
+                    if (currentCarPrice.IsActive__c
+                            && oldCarPricesByCarIdMap.get(currentCarPrice.Car__c) != null
+                            && oldCarPricesByCarIdMap.get(currentCarPrice.Car__c).size() > 0) {
+                        for (CarPrice__c oldCarPrice : oldCarPricesByCarIdMap.get(currentCarPrice.Car__c)) {
+                            if (oldCarPrice.IsActive__c) {
+                                oldCarPrice.IsActive__c = false;
+                                carPricesToBeDeactivatedList.add(oldCarPrice);
+                            }
+                        }
+                    }
+
+                }
+
+                if (!carPricesToBeDeactivatedList.isEmpty()) {
+                    update carPricesToBeDeactivatedList;
+                }
             }
+
+        }catch(Exception e) {
+            System.debug('Exception Caught: ' + e);
         }
 
     }

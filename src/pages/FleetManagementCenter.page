@@ -4,6 +4,7 @@
     <apex:sectionHeader subtitle="Fleet Management Center" title="Fleet Management"/>
 
     <script type="text/javascript">
+
         function checkAll(cb, cbid) {
             var inputElem = document.getElementsByTagName("input");
 
@@ -13,30 +14,25 @@
                 }
             }
         }
+
     </script>
 
     <apex:form id="theForm">
         <apex:pageBlock>
-
             <apex:pageMessages id="theMessages"/>
 
             <apex:outputText title="info" value="Please select Car Type(s) to show details: " style="font-weight:800"/>
 
             <apex:pageBlockSection columns="2" collapsible="true">
+
                 <apex:outputPanel id="carTypePanel">
 
-                    <apex:pageBlockTable title="Car Types" value="{!carTypeWrapperList}" var="carTypeWrapper"
-                                         rendered="{!hasCarType}">
+                    <apex:pageBlockTable title="Car Types" value="{!carTypeWrapperList}" var="carTypeWrapper" rendered="{!hasCarType}">
                         <apex:column>
                             <apex:facet name="header">
                                 <apex:inputCheckbox onclick="checkAll(this,'checkOrUncheckButton')"/>
                             </apex:facet>
-
-                            <apex:actionRegion>
                                 <apex:inputCheckbox value="{!carTypeWrapper.selected}" id="checkOrUncheckButton"/>
-                                <apex:actionSupport event="onclick" action="{!setSelectedCarWrapperList}" reRender="selectedCarsPanel"/>
-                            </apex:actionRegion>
-
                         </apex:column>
 
                         <apex:column headerValue="Car Type Name" value="{!carTypeWrapper.name}" style="width:250px"/>
@@ -117,6 +113,7 @@
 
 
                 <apex:outputPanel id="selectedCarsPanel">
+
                     <apex:pageBlockTable title="Car Details" value="{!selectedCarWrapperList}" var="selectedCarWrapper" rendered="{!hasCarType}">
 
                         <apex:column headerValue="Car Type Name" value="{!selectedCarWrapper.carTypeName}" style="width:250px"/>
@@ -129,14 +126,16 @@
                         <apex:column headerValue="Number of Available Cars" value="{!selectedCarWrapper.numberOfAvailableCars}"/>
 
                     </apex:pageBlockTable>
+
                 </apex:outputPanel>
 
             </apex:pageBlockSection>
 
             <apex:pageBlockButtons location="top">
                 <apex:outputPanel id="carTypeButtons">
-                    <apex:commandButton value="Show Selected Car Details" action="{!setSelectedCarWrapperList}"
-                                        style="width:165px;" disabled="{!!hasCarType}" reRender="selectedCarsPanel, carTypeButtons"/>
+                    <apex:commandButton value="Show Selected Car Details" action="{!updateSelectedCarWrapperList}"
+                                        style="width:165px;" disabled="{!!hasCarType}" reRender="selectedCarsPanel, carTypeButtons, theMessages"/>
+
                     <apex:commandButton value="Cancel" action="{!cancel}"
                                         style="width:160px;"/>
                 </apex:outputPanel>
@@ -163,7 +162,6 @@
                 </apex:outputPanel>
             </apex:pageBlockButtons>
 
-
         </apex:pageBlock>
 
         <apex:outputPanel id="filterPanel" rendered="{!hasCarType}">
@@ -177,5 +175,7 @@
                 </apex:selectList>
             </apex:actionRegion>
         </apex:outputPanel>
+
     </apex:form>
+
 </apex:page>

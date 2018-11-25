@@ -2,7 +2,6 @@ public with sharing class FleetManagementUtils {
 
     public class CarTypeWrapper {
 
-        //Variable to hold Car Type fields
         public CarType__c carType {get; set;}
         public String name {get; set;}
         public Integer numberOfCarsOwned {get; set;}

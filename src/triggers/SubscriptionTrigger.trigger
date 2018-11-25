@@ -111,7 +111,11 @@ trigger SubscriptionTrigger on Subscription__c (before insert, after insert, aft
         Map<Id, List<Car__c>> availableCarsByCarTypeIdMap = new Map<Id, List<Car__c>>();
 
         //There should be only one active Car Price Record
-        List<Car__c> availableCars = [SELECT Id, CarType__c, IsAvailable__c, (SELECT Id, Price__r.MonthlyAmount__c FROM CarPrices__r WHERE IsActive__c = true LIMIT 1) FROM Car__c WHERE CarType__c IN :availableCarTypeOfContractedSubscriptionsSet AND IsAvailable__c = true];
+        List<Car__c> availableCars = [SELECT
+                                        Id, CarType__c, IsAvailable__c,
+                                        (SELECT Id, Price__r.MonthlyAmount__c FROM CarPrices__r WHERE IsActive__c = true LIMIT 1)
+                                      FROM Car__c
+                                      WHERE CarType__c IN :availableCarTypeOfContractedSubscriptionsSet AND IsAvailable__c = true];
 
         for (Car__c availableCar : availableCars) {
 

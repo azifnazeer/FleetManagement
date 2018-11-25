@@ -11,38 +11,44 @@ trigger PriceTrigger on Price__c (before insert, before update) {
         Set<Id> carTypeIdSet = new Set<Id>();
         List<Price__c> pricesToBeDeactivatedList = new List<Price__c>();
 
-        for(Price__c currentPrice : currentPriceList) {
+        try {
 
-            if(currentPrice.IsActive__c) {
-                carTypeIdSet.add(currentPrice.CarType__c);
-            }
+            for (Price__c currentPrice : currentPriceList) {
 
-        }
-
-        if(!carTypeIdSet.isEmpty()) {
-            oldPricesByCarTypeIdMap = getOldPricesByCarTypeIdMap(carTypeIdSet);
-
-            for(Price__c currentPrice : currentPriceList) {
-
-                //Make sure only one price record is active at a time
-                if(currentPrice.IsActive__c
-                        && oldPricesByCarTypeIdMap.get(currentPrice.CarType__c) != null
-                        && oldPricesByCarTypeIdMap.get(currentPrice.CarType__c).size() > 0) {
-
-                    for(Price__c oldPrice : oldPricesByCarTypeIdMap.get(currentPrice.CarType__c)) {
-                        if(oldPrice.IsActive__c) {
-                            oldPrice.IsActive__c = false;
-                            pricesToBeDeactivatedList.add(oldPrice);
-                        }
-                    }
-
+                if (currentPrice.IsActive__c) {
+                    carTypeIdSet.add(currentPrice.CarType__c);
                 }
 
             }
 
-            if(!pricesToBeDeactivatedList.isEmpty()) {
-                update pricesToBeDeactivatedList;
+            if (!carTypeIdSet.isEmpty()) {
+                oldPricesByCarTypeIdMap = getOldPricesByCarTypeIdMap(carTypeIdSet);
+
+                for (Price__c currentPrice : currentPriceList) {
+
+                    //Make sure only one price record is active at a time
+                    if (currentPrice.IsActive__c
+                            && oldPricesByCarTypeIdMap.get(currentPrice.CarType__c) != null
+                            && oldPricesByCarTypeIdMap.get(currentPrice.CarType__c).size() > 0) {
+
+                        for (Price__c oldPrice : oldPricesByCarTypeIdMap.get(currentPrice.CarType__c)) {
+                            if (oldPrice.IsActive__c) {
+                                oldPrice.IsActive__c = false;
+                                pricesToBeDeactivatedList.add(oldPrice);
+                            }
+                        }
+
+                    }
+
+                }
+
+                if (!pricesToBeDeactivatedList.isEmpty()) {
+                    update pricesToBeDeactivatedList;
+                }
             }
+
+        }catch(Exception e) {
+            System.debug('Exception Caught: ' + e);
         }
 
     }
