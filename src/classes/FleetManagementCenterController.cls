@@ -11,6 +11,7 @@ public with sharing class FleetManagementCenterController {
 
     public Boolean numberOfCarsOwnedSort { get; set; }
     public Boolean numberOfCarsOnRoadSort { get; set; }
+    public Boolean averageRevenuePerKmSort { get; set; }
 
     public Boolean SortAscending { get; set; }
     public Boolean SortDescending { get; set; }
@@ -29,8 +30,9 @@ public with sharing class FleetManagementCenterController {
     public FleetManagementCenterController() {
 
         //Initializing sorting parameters
-        this.numberOfCarsOwnedSort = true;
+        this.numberOfCarsOwnedSort = false;
         this.numberOfCarsOnRoadSort = false;
+        this.averageRevenuePerKmSort = true;
 
         //Initialize pagination parameters
         initializePaginationParameters();
@@ -95,11 +97,10 @@ public with sharing class FleetManagementCenterController {
         String sOrderByAscOrDesc = String.isEmpty(this.orderByAscDesc) ? '' : ' ' + this.orderByAscDesc + ' NULLS LAST';
         String sLimit = ' LIMIT ' + this.paginationSize;
         String sOffset = ' OFFSET ' + this.currentListOffset;
-        //String sManufacturerIdClause = '(\'\')';
 
         String sSelectFromANDWhereClause =
-                'SELECT Id, Name, NumberOfCarsOnRoad__c, NumberOfCarsOwned__c, NumberOfAvailableCars__c, '
-                        + ' Manufacturer__c, Manufacturer__r.Name, FirstSubscriptionDate__c,'
+                'SELECT Id, Name, NumberOfCarsOnRoad__c, NumberOfCarsOwned__c, NumberOfAvailableCars__c, AverageRevenuePerKm__c,'
+                        + ' TotalRevenue__c, TotalMileage__c, Manufacturer__c, Manufacturer__r.Name, FirstSubscriptionDate__c,'
                         + ' (SELECT Id, TotalRevenueUntilToday__c FROM Subscriptions__r),'
                         + ' (SELECT Id, KilometersDriven__c, IsAvailable__c FROM Cars__r)'
                         + ' FROM CarType__c';
@@ -228,6 +229,7 @@ public with sharing class FleetManagementCenterController {
     public PageReference sortByNumberOfCarsOwned() {
         this.numberOfCarsOwnedSort = true;
         this.numberOfCarsOnRoadSort = false;
+        this.averageRevenuePerKmSort = false;
 
         return sortByValue('NumberOfCarsOwned__c');
     }
@@ -235,8 +237,17 @@ public with sharing class FleetManagementCenterController {
     public PageReference sortByNumberOfCarsOnRoad() {
         this.numberOfCarsOwnedSort = false;
         this.numberOfCarsOnRoadSort = true;
+        this.averageRevenuePerKmSort = false;
 
         return sortByValue('NumberOfCarsOnRoad__c');
+    }
+
+    public PageReference sortByAverageRevenuePerKmSort() {
+        this.numberOfCarsOwnedSort = false;
+        this.numberOfCarsOnRoadSort = false;
+        this.averageRevenuePerKmSort = true;
+
+        return sortByValue('AverageRevenuePerKm__c');
     }
 
     private PageReference sortByValue(string value) {

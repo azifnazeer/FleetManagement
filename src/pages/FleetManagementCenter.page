@@ -79,6 +79,25 @@
                             </apex:facet>
                         </apex:column>
 
+                        <apex:column headerValue="Average Revenue Per Km" value="{!carTypeWrapper.averageRevenuePerKm}">
+                            <apex:facet name="header">
+                                <apex:commandLink action="{!sortByAverageRevenuePerKmSort}" reRender="carTypePanel">
+                                    Average Revenue Per Km
+                                    <apex:outputPanel layout="none" rendered="{!averageRevenuePerKmSort = false}">&nbsp;
+                                        &nbsp; &#9650;&#9660;
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none"
+                                                      rendered="{!averageRevenuePerKmSort = true && orderByAscDesc='Asc'}">
+                                        &nbsp; &nbsp; &#9650;
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none"
+                                                      rendered="{!averageRevenuePerKmSort = true && orderByAscDesc='Desc'}">
+                                        &nbsp; &nbsp; &#9660;
+                                    </apex:outputPanel>
+                                </apex:commandLink>
+                            </apex:facet>
+                        </apex:column>
+
                         <apex:facet name="footer">Page {!pageNumber} of {!totalPages} / Records {!currentListOffset}
                             -{!MIN(currentListOffset + paginationSize, currentListSize)}
                             of {!currentListSize}</apex:facet>
@@ -103,7 +122,6 @@
                         <apex:column headerValue="Car Type Name" value="{!selectedCarWrapper.carTypeName}" style="width:250px"/>
                         <apex:column headerValue="Manufacturer" value="{!selectedCarWrapper.manufacturer}"/>
                         <apex:column headerValue="Total Revenue" value="{!selectedCarWrapper.totalRevenue}"/>
-                        <apex:column headerValue="Average Revenue Per Km" value="{!selectedCarWrapper.averageRevenuePerKm}"/>
                         <apex:column headerValue="Average Revenue Per Car" value="{!selectedCarWrapper.averageRevenuePerCar}"/>
                         <apex:column headerValue="Total Mileage" value="{!selectedCarWrapper.totalMileage}"/>
                         <apex:column headerValue="Average Mileage" value="{!selectedCarWrapper.averageMileage}"/>
