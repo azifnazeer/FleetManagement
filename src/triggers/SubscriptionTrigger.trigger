@@ -62,26 +62,28 @@ trigger SubscriptionTrigger on Subscription__c (before insert, after insert, aft
         if (!availableCarTypeOfContractedSubscriptionsSet.isEmpty()) {
             availableCarsByCarTypeIdMap = getAvailableCarsByCarTypeIdMap(availableCarTypeOfContractedSubscriptionsSet);
 
-            for (Subscription__c currentSubscription : currentSubscriptionList) {
-                for (Car__c availableCar : availableCarsByCarTypeIdMap.get(currentSubscription.CarType__c)) {
+            if(!availableCarsByCarTypeIdMap.isEmpty()) {
+                for (Subscription__c currentSubscription : currentSubscriptionList) {
+                    for (Car__c availableCar : availableCarsByCarTypeIdMap.get(currentSubscription.CarType__c)) {
 
-                    //Assign available cars to the subscriptions & update the IsAvailable field in the respective car
-                    if (availableCar.IsAvailable__c) {
-                        currentSubscription.Car__c = availableCar.Id;
-                        currentSubscription.MonthlyAmount__c = availableCar.CarPrices__r.get(0).Price__r.MonthlyAmount__c;
-                        availableCar.IsAvailable__c = false;
+                        //Assign available cars to the subscriptions & update the IsAvailable field in the respective car
+                        if (availableCar.IsAvailable__c) {
+                            currentSubscription.Car__c = availableCar.Id;
+                            currentSubscription.MonthlyAmount__c = availableCar.CarPrices__r.get(0).Price__r.MonthlyAmount__c;
+                            availableCar.IsAvailable__c = false;
 
-                        carsToBeUpdatedWithAvailability.add(availableCar);
+                            carsToBeUpdatedWithAvailability.add(availableCar);
 
-                        //break after one available car is assigned to the current subscription
-                        break;
+                            //break after one available car is assigned to the current subscription
+                            break;
+                        }
+
                     }
-
                 }
-            }
 
-            if(!carsToBeUpdatedWithAvailability.isEmpty()) {
-                update carsToBeUpdatedWithAvailability;
+                if(!carsToBeUpdatedWithAvailability.isEmpty()) {
+                    update carsToBeUpdatedWithAvailability;
+                }
             }
 
         }

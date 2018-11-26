@@ -178,7 +178,7 @@ public with sharing class FleetManagementCenterControllerTest {
 
             //Assert one info message is present
             System.assertEquals(1, ApexPages.getMessages().size());
-            
+
         }
 
     }
