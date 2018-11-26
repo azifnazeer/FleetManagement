@@ -21,7 +21,7 @@
         <apex:pageBlock>
             <apex:pageMessages id="theMessages"/>
 
-            <apex:outputText title="info" value="Please select Car Type(s) to show details: " style="font-weight:800"/>
+            <apex:outputText title="info" value="Please select Car Type(s) for showing details: " style="font-weight:800"/>
 
             <apex:pageBlockSection columns="2" collapsible="true">
 
@@ -170,7 +170,6 @@
                 <apex:selectList value="{!selectedManufacturer}" size="1" id="filterByManufacturerPicklist">
                     <apex:actionSupport event="onchange" action="{!resetPaginationParametersAndCarTypeSelections}"
                                         reRender="carTypePanel, selectedCarTypesPanel, paginationButtons"></apex:actionSupport>
-                    <apex:selectoption itemLabel="All" itemValue="all"></apex:selectoption>
                     <apex:selectOptions value="{!manufacturerSelectOptions}"/>
                 </apex:selectList>
             </apex:actionRegion>

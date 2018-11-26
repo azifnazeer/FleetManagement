@@ -22,7 +22,7 @@ public with sharing class FleetManagementCenterController {
     public String orderBy { get; set; }
     public String orderByAscDesc { get; set; }
 
-    public Map<Id, CarManufacturer__c> carManufacturersByNameMap { get; set; }
+    public Map<Id, CarManufacturer__c> carManufacturersByIdMap { get; set; }
 
     public List<SelectOption> manufacturerSelectOptions{set;}
     public String selectedManufacturer{get;set;}
@@ -43,7 +43,7 @@ public with sharing class FleetManagementCenterController {
         initializePaginationParameters();
 
         //Initializing manufacture map
-        this.carManufacturersByNameMap = getCarManufacturersByIdMap();
+        this.carManufacturersByIdMap = getCarManufacturersByIdMap();
 
         //Initializing car type wrapper list
         this.carTypeWrapperList = getCarTypeWrapperList();
@@ -116,7 +116,7 @@ public with sharing class FleetManagementCenterController {
 
             //Add a message, if no Car Types have been selected
             if(!hasSelectedCarType) {
-                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.INFO, 'Please select atleast one Car Type to show the details'));
+                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.INFO, 'Please select atleast one Car Type for showing details'));
             }
 
             return null;
@@ -180,11 +180,11 @@ public with sharing class FleetManagementCenterController {
     */
     private Map<Id, CarManufacturer__c> getCarManufacturersByIdMap() {
 
-        if(this.carManufacturersByNameMap == null) {
+        if(this.carManufacturersByIdMap == null) {
             return (new Map<Id, CarManufacturer__c>([SELECT Id, Name FROM CarManufacturer__c WHERE NumberOfCarTypes__c > 0 ORDER BY Name ASC]));
         }
 
-        return this.carManufacturersByNameMap;
+        return this.carManufacturersByIdMap;
 
     }
 
@@ -221,7 +221,10 @@ public with sharing class FleetManagementCenterController {
 
         List<SelectOption> options = new List<SelectOption>();
 
-        for(CarManufacturer__c carManufacturer : this.carManufacturersByNameMap.values()) {
+        //Adding an option for showing all car types
+        options.add(new SelectOption('all', 'All'));
+
+        for(CarManufacturer__c carManufacturer : this.carManufacturersByIdMap.values()) {
             options.add(new SelectOption(carManufacturer.Id, carManufacturer.Name));
         }
 
@@ -236,7 +239,7 @@ public with sharing class FleetManagementCenterController {
 
         //Limit list size, if a manufacturer filter is applied
         if(this.selectedManufacturer != null && this.selectedManufacturer != 'all') {
-            this.currentListSize = [SELECT count() FROM CarType__c WHERE Manufacturer__c = :this.carManufacturersByNameMap.get(this.selectedManufacturer).Id];
+            this.currentListSize = [SELECT count() FROM CarType__c WHERE Manufacturer__c = :this.carManufacturersByIdMap.get(this.selectedManufacturer).Id];
         } else {
             this.currentListSize = [SELECT count() FROM CarType__c];
         }
