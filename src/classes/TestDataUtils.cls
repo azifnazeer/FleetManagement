@@ -118,27 +118,6 @@ public with sharing class TestDataUtils {
 
     }
 
-    /*
-    public static List<CarPrice__c> createCarPrices(List<Car__c> carList, List<Price__c> priceList) {
-
-        List<CarPrice__c> carPricesList = new List<CarPrice__c>();
-
-        for(Car__c car : carList) {
-
-            for(Price__c price : priceList) {
-
-                if(price.CarType__c == car.CarType__c) {
-                    carPricesList.add(new CarPrice__c(Price__c = price.Id, Car__c = car.Id));
-                }
-            }
-
-        }
-
-        return carPricesList;
-
-    }
-    */
-
     public static List<Subscription__c> createSubscriptions(List<Car__c> carList, List<Account> accountList) {
 
         List<Subscription__c> subscriptionList = new List<Subscription__c>();
